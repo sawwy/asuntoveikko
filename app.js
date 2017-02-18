@@ -1,5 +1,7 @@
 var express = require('express'),
-	bodyParser = require('body-parser');
+	bodyParser = require('body-parser'),
+	path = require('path');
+	
 
 var models = require('./models/index');
 
@@ -11,7 +13,7 @@ var apartmentRouter = express.Router();
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
-
+app.use(express.static('static'))
 apartmentRouter.route('/Apartments')
 	.post(function(req, res) {
 		models.Apartment.create(req.body).then(function(apartment) {
@@ -39,7 +41,7 @@ apartmentRouter.route('/Apartments/:apartmentId')
 app.use('/api', apartmentRouter);
 
 app.get('/', function(req, res) {
-	res.send('Welcome to Asuntoveikko!');
+	res.sendFile(path.join(__dirname + '/static/index.html'));
 });
 
 app.listen(port, function() {
