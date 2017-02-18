@@ -1,12 +1,8 @@
 var express = require('express'),
-	mongoose = require('mongoose'),
 	bodyParser = require('body-parser');
 
-var db = mongoose.connect('mongodb://localhost/apartmentAPI');
-var apartment = require('./models/apartmentModel');
+var models = require('./models/index');
 
-var Apartment = mongoose.model('Apartment');
-	
 var app = express();
 
 var port = process.env.PORT || 3000;
@@ -18,35 +14,25 @@ app.use(bodyParser.json());
 
 apartmentRouter.route('/Apartments')
 	.post(function(req, res) {
-		var apartment = new Apartment(req.body);
-		
-		console.log(apartment);
-		apartment.save();
-		res.status(201).send(apartment);
+		models.Apartment.create(req.body).then(function(apartment) {
+            console.log(apartment);
+            res.status(201).json(apartment);
+        });
 	})
 	.get(function(req, res) {
-		
-		var query = {};
-		if(req.query.address) {
-			query.address = req.query.address;
-		}
-		Apartment.find(query, function(err, apartments) {
-			if(err)
-				res.status(500);
-			else 
-				res.json(apartments);
+	    models.Apartment.findAll({}).then(function(apartments) {
+            res.json(apartments);
 		});
 	});
 
 apartmentRouter.route('/Apartments/:apartmentId')
-	
 	.get(function(req, res) {
-		
-		Apartment.findById(req.params.apartmentId, function(err, apartment) {
-			if(err)
-				res.status(500);
-			else 
-				res.json(apartment);
+        models.Apartment.find({
+            where: {
+                id: req.params.apartmentId
+            }
+        }).then(function(apartment) {
+            res.json(apartment);
 		});
 	});
 	
