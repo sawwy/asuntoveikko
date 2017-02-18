@@ -2,6 +2,7 @@ var express = require('express'),
 	bodyParser = require('body-parser');
 
 var models = require('./models/index');
+var sequelize = require('sequelize');
 
 var app = express();
 
@@ -36,6 +37,18 @@ apartmentRouter.route('/Apartments/:apartmentId')
 		});
 	});
 	
+apartmentRouter.route('/Apartments/by-location/lat=:lat&lon=:lon')
+	.get(function(req, res) {
+        models.Apartment.findAll({
+            order: [
+                sequelize.fn('ST_Distance', sequelize.col('location'), sequelize.fn('ST_Point', parseFloat(req.params.lon), parseFloat(req.params.lat))),
+            ],
+            limit: 10
+        }).then(function(apartments) {
+            res.json(apartments);
+		});
+	});
+
 app.use('/api', apartmentRouter);
 
 app.get('/', function(req, res) {
