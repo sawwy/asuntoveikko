@@ -55,6 +55,7 @@ app.use('/api', apartmentRouter);
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname + '/static/index.html'));
+	
 });
 
 app.listen(port, function() {
